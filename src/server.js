@@ -9,6 +9,7 @@ export const setupServer = async () => {
     const app = express();
     const PORT = Number(getEnvVar("PORT", "3000"));
 
+
     app.use(pino({
         transport: {
             target: 'pino-pretty',
@@ -17,7 +18,10 @@ export const setupServer = async () => {
 
     app.use(cors());
 
-    app.listen(PORT, () => {
+    app.listen(PORT, (error) => {
+        if (error) {
+            throw error;
+        }
         console.log(`Server is running on port ${PORT}`);
     });
 
