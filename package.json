@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "lint": "eslint src/**/*.js",
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
