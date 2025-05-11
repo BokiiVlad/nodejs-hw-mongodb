@@ -29,9 +29,9 @@ export const setupServer = async () => {
         });
     });
 
-    app.get("/contacts/:contactId", (req, res, next) => {
+    app.get("/contacts/:contactId", async (req, res, next) => {
         const { contactId } = req.params;
-        const contact = getContactById(contactId);
+        const contact = await getContactById(contactId);
         if (!contact) {
             res.status(404).json({
                 message: 'Contact not found',
