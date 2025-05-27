@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-export const contactSchemaValidete = Joi.object({
+export const contactSchemaValidate = Joi.object({
     name: Joi.string().min(3).max(20).required(),
     phoneNumber: Joi.string()
         .pattern(/^[0-9+\-\s()]{7,20}$/)
