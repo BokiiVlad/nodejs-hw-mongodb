@@ -12,7 +12,7 @@ export const getAllContacts = async ({ page, perPage, sortBy, sortOrder, filter,
         contactsQuery.where("contactType").equals(filter.contactType);
     };
 
-    if (filter.isFavourite) {
+    if (filter.isFavourite !== undefined) {
         contactsQuery.where("isFavourite").equals(filter.isFavourite);
     };
 
@@ -27,8 +27,8 @@ export const getAllContacts = async ({ page, perPage, sortBy, sortOrder, filter,
     };
 };
 
-export const getContactById = async (contactId) => {
-    const contact = await ContactCollection.findById(contactId);
+export const getContactById = async ({ _id, userId }) => {
+    const contact = await ContactCollection.findOne({ _id, userId });
     return contact;
 };
 
@@ -37,12 +37,12 @@ export const createContact = async (payload) => {
     return contact;
 };
 
-export const deleteContact = async (contactId) => {
-    const contact = await ContactCollection.findByIdAndDelete(contactId);
+export const deleteContact = async ({ _id, userId }) => {
+    const contact = await ContactCollection.findOneAndDelete({ _id, userId });
     return contact;
 };
-export const patchContact = async (contactId, payload) => {
-    const contact = await ContactCollection.findByIdAndUpdate(contactId, payload, {
+export const patchContact = async ({ _id, userId }, payload) => {
+    const contact = await ContactCollection.findOneAndUpdate({ _id, userId }, payload, {
         new: true,
         upsert: true,
     });
