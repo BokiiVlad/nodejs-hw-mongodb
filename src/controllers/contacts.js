@@ -9,7 +9,7 @@ export const getAllContactsController = async (req, res) => {
     const { sortBy, sortOrder } = parseSortParams(req.query);
     const filter = parseFilterParams(req.query);
 
-    const contacts = await getAllContacts({ page, perPage, sortBy, sortOrder, filter, userId: req.user._id });
+    const contacts = await getAllContacts({ page, perPage, sortBy, sortOrder, filter, userId: req.user.id });
 
     res.status(200).json({
         "status": 200,
@@ -26,6 +26,10 @@ export const getContactByIdController = async (req, res, next) => {
         return next(createHttpError(404, "Contact not found"));
     };
 
+    if (contact.ownerId.toString() !== req.user.id.toString()) {
+        throw new createHttpError.NotFound('Student not found');
+    }
+
     res.status(200).json({
         status: 200,
         message: `Successfully found contact with id ${contactId}!`,
@@ -36,7 +40,7 @@ export const getContactByIdController = async (req, res, next) => {
 
 export const createContactController = async (req, res) => {
     const body = req.body;
-    const contact = await createContact({ ...body, userId: req.user._id });
+    const contact = await createContact({ ...body, userId: req.user.id });
 
     res.status(201).json({
         status: 201,
