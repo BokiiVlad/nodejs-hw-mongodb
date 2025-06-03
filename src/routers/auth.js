@@ -1,10 +1,12 @@
 import { Router } from "express";
-import { loginUserController, logoutUserController, refreshUserSessionController, registerUserController } from "../controllers/auth.js";
+import { loginUserController, logoutUserController, refreshUserSessionController, registerUserController, resetUserEmailController } from "../controllers/auth.js";
 import { ctrlWrapper } from "../utils/ctrlWrapper.js";
 import { validateBody } from "../middlewares/validateBody.js";
-import { loginSchemaValidate, registerSchemaValidate } from "../validation/auth.js";
+import { loginSchemaValidate, registerSchemaValidate, requestResetEmailSchema } from "../validation/auth.js";
 
 const router = Router();
+
+router.post("/send-reset-email", validateBody(requestResetEmailSchema), ctrlWrapper(resetUserEmailController));
 
 router.post("/register", validateBody(registerSchemaValidate), ctrlWrapper(registerUserController));
 

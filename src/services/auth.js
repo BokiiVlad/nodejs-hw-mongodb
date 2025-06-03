@@ -4,6 +4,42 @@ import bcrypt from "bcrypt";
 import { randomBytes } from 'crypto';
 import { FIFTEEN_MINUTES, ONE_DAY } from "../constants/index.js";
 import { SessionCollection } from "../db/models/session.js";
+import jwt from "jsonwebtoken";
+import { getEnvVar } from "../utils/getEnvVar.js";
+import { sendEmail } from "../utils/sendMail.js";
+import { SMTP } from "../constants/index.js";
+
+
+export const resetUserEmail = async (email) => {
+    const user = await UserCollection.findOne({ email });
+    if (user === null) {
+        throw new createHttpError.NotFound("User not found!");
+    };
+    const tokenJwt = jwt.sign(
+        {
+            sub: user._id,
+            name: user.name,
+        },
+        getEnvVar("JWT_SECRET"),
+        {
+            expiresIn: '5m',
+        },
+    );
+    try {
+        await sendEmail({
+            from: getEnvVar(SMTP.SMTP_FROM),
+            to: email,
+            secure: false,
+            subject: 'Reset your password',
+            html: `${getEnvVar("APP_DOMAIN")}/reset-password?token=${tokenJwt}`
+        });
+
+    } catch (error) {
+        console.log(error);
+        throw createHttpError.InternalServerError("Failed to send the email, please try again later.");
+    }
+
+};
 
 
 export const registerUser = async (payload) => {

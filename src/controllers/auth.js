@@ -1,5 +1,17 @@
 import { ONE_DAY } from "../constants/index.js";
-import { loginUser, logoutUser, refreshSession, registerUser } from "../services/auth.js";
+import { loginUser, logoutUser, refreshSession, registerUser, resetUserEmail } from "../services/auth.js";
+
+export const resetUserEmailController = async (req, res) => {
+    await resetUserEmail(req.body.email);
+
+    res.status(200).json({
+        status: 200,
+        message: "Reset password email has been successfully sent.",
+        data: {}
+    });
+
+};
+
 
 
 export const registerUserController = async (req, res) => {
