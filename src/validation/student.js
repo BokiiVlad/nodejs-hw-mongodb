@@ -1,8 +1,12 @@
 import Joi from 'joi';
 
-export const contactSchemaValidete = Joi.object({
+export const contactSchemaValidate = Joi.object({
     name: Joi.string().min(3).max(20).required(),
-    phoneNumber: Joi.number().min(9).max(18),
+    phoneNumber: Joi.string()
+        .pattern(/^[0-9+\-\s()]{7,20}$/)
+        .min(7)
+        .max(20)
+        .required(),
     email: Joi.string().email().min(3).max(20).required(),
     isFavourite: Joi.boolean().default(false),
     contactType: Joi.string().min(3).max(20).valid('work', 'home', 'personal'),

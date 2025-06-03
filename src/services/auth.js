@@ -1,0 +1,106 @@
+import createHttpError from "http-errors";
+import { UserCollection } from "../db/models/user.js";
+import bcrypt from "bcrypt";
+import { randomBytes } from 'crypto';
+import { FIFTEEN_MINUTES, ONE_DAY } from "../constants/index.js";
+import { SessionCollection } from "../db/models/session.js";
+import jwt from "jsonwebtoken";
+import { getEnvVar } from "../utils/getEnvVar.js";
+import { sendEmail } from "../utils/sendMail.js";
+import { SMTP } from "../constants/index.js";
+
+
+export const resetUserEmail = async (email) => {
+    const user = await UserCollection.findOne({ email });
+    if (user === null) {
+        throw new createHttpError.NotFound("User not found!");
+    };
+    const tokenJwt = jwt.sign(
+        {
+            sub: user._id,
+            name: user.name,
+        },
+        getEnvVar("JWT_SECRET"),
+        {
+            expiresIn: '5m',
+        },
+    );
+    try {
+        await sendEmail({
+            from: getEnvVar(SMTP.SMTP_FROM),
+            to: email,
+            secure: false,
+            subject: 'Reset your password',
+            html: `${getEnvVar("APP_DOMAIN")}/reset-password?token=${tokenJwt}`
+        });
+
+    } catch (error) {
+        console.log(error);
+        throw createHttpError.InternalServerError("Failed to send the email, please try again later.");
+    }
+
+};
+
+
+export const registerUser = async (payload) => {
+    const user = await UserCollection.findOne({ email: payload.email });
+    if (user !== null) {
+        throw new createHttpError.Conflict('Email in use');
+    };
+    const encryptedPassword = await bcrypt.hash(payload.password, 10);
+    return UserCollection.create({ ...payload, password: encryptedPassword });
+};
+
+export const loginUser = async (payload) => {
+    const user = await UserCollection.findOne({ email: payload.email });
+    if (user === null) {
+        throw new createHttpError.Unauthorized("Email or password is incorrect");
+    }
+    const isEqual = await bcrypt.compare(payload.password, user.password);
+
+    if (!isEqual) {
+        throw new createHttpError.Unauthorized("Email or password is incorrect");
+    };
+
+    await SessionCollection.deleteOne({ userId: user._id });
+    const accessToken = randomBytes(30).toString('base64');
+    const refreshToken = randomBytes(30).toString('base64');
+
+    return await SessionCollection.create({
+        userId: user._id,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
+        refreshTokenValidUntil: new Date(Date.now() + ONE_DAY),
+    });
+};
+
+export const logoutUser = async (sessionId) => {
+    await SessionCollection.deleteOne({ _id: sessionId });
+};
+
+export const refreshSession = async (sessionId, refreshToken) => {
+    const session = await SessionCollection.findOne({ _id: sessionId });
+
+    if (session === null) {
+        throw new createHttpError.Unauthorized("Session not found");
+    };
+
+    if (session.refreshToken !== refreshToken) {
+        throw new createHttpError.Unauthorized("Refresh token is invalid");
+    };
+
+    if (session.refreshTokenValidUntil < new Date()) {
+        throw new createHttpError.Unauthorized("Refresh token is expired");
+    };
+
+    await SessionCollection.deleteOne({ _id: session._id });
+
+    return await SessionCollection.create({
+        userId: session.userId,
+        accessToken: randomBytes(30).toString('base64'),
+        refreshToken: randomBytes(30).toString('base64'),
+        accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
+        refreshTokenValidUntil: new Date(Date.now() + ONE_DAY),
+    });
+};
