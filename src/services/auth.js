@@ -24,6 +24,8 @@ export const resetPassword = async (payload) => {
         email: entries.email,
         _id: entries.sub,
     });
+    console.log(entries.email);
+    console.log(entries.sub);
 
     if (!user) {
         throw new createHttpError(404, "User not found!");
@@ -47,6 +49,7 @@ export const resetUserEmail = async (email) => {
         {
             sub: user._id,
             name: user.name,
+            email: user.email
         },
         getEnvVar("JWT_SECRET"),
         {
