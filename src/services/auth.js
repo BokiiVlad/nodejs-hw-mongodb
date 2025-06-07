@@ -9,6 +9,36 @@ import { getEnvVar } from "../utils/getEnvVar.js";
 import { sendEmail } from "../utils/sendMail.js";
 import { SMTP } from "../constants/index.js";
 
+export const resetPassword = async (payload) => {
+    let entries;
+
+    try {
+        entries = jwt.verify(payload.token, getEnvVar("JWT_SECRET"));
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new createHttpError.Unauthorized("Token is expired or invalid.");
+        };
+        throw error;
+    }
+    const user = await UserCollection.findOne({
+        email: entries.email,
+        _id: entries.sub,
+    });
+    console.log(entries.email);
+    console.log(entries.sub);
+
+    if (!user) {
+        throw new createHttpError(404, "User not found!");
+    }
+
+    const encryptedPassword = await bcrypt.hash(payload.password, 10);
+
+    await UserCollection.updateOne(
+        { _id: user._id },
+        { password: encryptedPassword }
+    );
+    await SessionCollection.deleteOne({ _id: user._id });
+};
 
 export const resetUserEmail = async (email) => {
     const user = await UserCollection.findOne({ email });
@@ -19,12 +49,14 @@ export const resetUserEmail = async (email) => {
         {
             sub: user._id,
             name: user.name,
+            email: user.email
         },
         getEnvVar("JWT_SECRET"),
         {
             expiresIn: '5m',
         },
     );
+
     try {
         await sendEmail({
             from: getEnvVar(SMTP.SMTP_FROM),
