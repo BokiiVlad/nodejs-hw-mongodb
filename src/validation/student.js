@@ -8,6 +8,6 @@ export const contactSchemaValidate = Joi.object({
         .max(20)
         .required(),
     email: Joi.string().email().min(3).max(20).required(),
-    isFavourite: Joi.boolean().default(false),
+    isFavorite: Joi.boolean().default(false),
     contactType: Joi.string().min(3).max(20).valid('work', 'home', 'personal'),
 });
