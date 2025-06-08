@@ -3,6 +3,10 @@ import createHttpError from "http-errors";
 import { parsePaginationParams } from "../utils/parsePaginationParams.js";
 import { parseSortParams } from "../utils/parseSortParams.js";
 import { parseFilterParams } from "../utils/parseFilterParams.js";
+import { saveFileToCloudinary } from "../utils/saveFileToCloudinary.js";
+import { getEnvVar } from "../utils/getEnvVar.js";
+import { saveFileToUploadDir } from "../utils/saveFileToUploadDir.js";
+import * as fs from "node:fs/promises";
 
 export const getAllContactsController = async (req, res) => {
     const { page, perPage } = parsePaginationParams(req.query);
@@ -40,10 +44,17 @@ export const getContactByIdController = async (req, res, next) => {
 
 export const createContactController = async (req, res) => {
     const body = req.body;
-    const contact = await createContact({ ...body, userId: req.user.id });
-
-    console.log(req.body);
+    let photo = null;
     console.log(req.file);
+
+    if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
+        // Записує в хмару
+        photo = await saveFileToCloudinary(req.file);
+    } else {
+        photo = await saveFileToUploadDir(req.file);
+    }
+    const contact = await createContact({ ...body, userId: req.user.id, photo });
+
 
     res.status(201).json({
         status: 201,
@@ -64,7 +75,16 @@ export const deleteContactController = async (req, res, next) => {
 
 export const patchContactController = async (req, res, next) => {
     const { contactId } = req.params;
-    const contact = await patchContact({ _id: contactId, userId: req.user.id }, req.body);
+    const photo = req.file;
+    let urlPhoto;
+
+    if (photo) {
+        if (getEnvVar("ENABLE_CLOUDINARY") === "true") {
+            urlPhoto = await saveFileToCloudinary(photo);
+        } else { urlPhoto = await saveFileToUploadDir(photo); };
+    };
+
+    const contact = await patchContact({ _id: contactId, userId: req.user.id }, { ...req.body, photo: urlPhoto });
 
     if (!contact) {
         return next(createHttpError(404, "Contact not found"));

@@ -1,13 +1,16 @@
 import createHttpError from "http-errors";
 import { UserCollection } from "../db/models/user.js";
 import bcrypt from "bcrypt";
+import path from "path";
 import { randomBytes } from 'crypto';
-import { FIFTEEN_MINUTES, ONE_DAY } from "../constants/index.js";
+import { FIFTEEN_MINUTES, ONE_DAY, TEMPLATES_DIR } from "../constants/index.js";
 import { SessionCollection } from "../db/models/session.js";
 import jwt from "jsonwebtoken";
 import { getEnvVar } from "../utils/getEnvVar.js";
 import { sendEmail } from "../utils/sendMail.js";
+import * as fs from "node:fs/promises";
 import { SMTP } from "../constants/index.js";
+import handlebars from 'handlebars';
 
 export const resetPassword = async (payload) => {
     let entries;
@@ -57,13 +60,29 @@ export const resetUserEmail = async (email) => {
         },
     );
 
+    // Шаблонізатор
+    const resetPasswordTemplatePath = path.join(
+        TEMPLATES_DIR,
+        'reset-password-email.html',
+    );
+
+    const templateSource = (
+        await fs.readFile(resetPasswordTemplatePath)
+    ).toString();
+
+    const template = handlebars.compile(templateSource);
+    const html = template({
+        name: user.name,
+        link: `${getEnvVar('APP_DOMAIN')}/reset-password?token=${tokenJwt}`,
+    });
+
     try {
         await sendEmail({
             from: getEnvVar(SMTP.SMTP_FROM),
             to: email,
             secure: false,
             subject: 'Reset your password',
-            html: `${getEnvVar("APP_DOMAIN")}/reset-password?token=${tokenJwt}`
+            html,
         });
 
     } catch (error) {
