@@ -1,4 +1,4 @@
-import path from "pach";
+import path from "path";
 import * as fs from "node:fs/promises";
 import { TEMP_UPLOAD_DIR, UPLOAD_DIR } from "../constants/index.js";
 import { getEnvVar } from "./getEnvVar.js";

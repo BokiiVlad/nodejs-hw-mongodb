@@ -44,17 +44,12 @@ export const getContactByIdController = async (req, res, next) => {
 
 export const createContactController = async (req, res) => {
     const body = req.body;
-
-
     let photo = null;
+    console.log(req.file);
 
-    if (getEnvVar('UPLOAD_TO_CLOUDINARY') === 'true') {
+    if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
         // Записує в хмару
-        const result = await saveFileToCloudinary(req.file.path);
-        // Видаляє з хмари
-        await fs.unlink(req.file.path);
-        // Записує результат (url )функції
-        photo = result.secure_url;
+        photo = await saveFileToCloudinary(req.file);
     } else {
         photo = await saveFileToUploadDir(req.file);
     }
