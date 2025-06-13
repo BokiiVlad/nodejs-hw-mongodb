@@ -6,7 +6,7 @@ import { parseFilterParams } from "../utils/parseFilterParams.js";
 import { saveFileToCloudinary } from "../utils/saveFileToCloudinary.js";
 import { getEnvVar } from "../utils/getEnvVar.js";
 import { saveFileToUploadDir } from "../utils/saveFileToUploadDir.js";
-import * as fs from "node:fs/promises";
+
 
 export const getAllContactsController = async (req, res) => {
     const { page, perPage } = parsePaginationParams(req.query);
@@ -26,12 +26,13 @@ export const getAllContactsController = async (req, res) => {
 export const getContactByIdController = async (req, res, next) => {
     const { contactId } = req.params;
     const contact = await getContactById({ _id: contactId, userId: req.user.id });
+
     if (!contact) {
         return next(createHttpError(404, "Contact not found"));
     };
 
     if (contact.ownerId.toString() !== req.user.id.toString()) {
-        throw new createHttpError.NotFound('Student not found');
+        throw new createHttpError.NotFound('Contact not found');
     }
 
     res.status(200).json({

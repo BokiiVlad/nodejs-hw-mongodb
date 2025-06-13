@@ -1,0 +1,61 @@
+tags:
+  - Contacts
+summary: 'Create contact'
+operationId: patchContact
+description: 'Create contact'
+security:
+  - bearerAuth: []
+requestBody:
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        properties:
+          name:
+            description: "Student's name"
+            type: string
+            example: 'John Doe'
+          phoneNumber:
+            description: "Student's phone number"
+            type: string
+            example: '+380999228945'
+          email:
+            description: "Student's email"
+            type: string
+            example: bokiyvladik@gmail.com
+          isFavourite:
+            description: 'Indicates whether the student is a favorite'
+            type: boolean
+            example: false
+          contactType:
+            description: 'Contact category'
+            type: string
+            enum: ['work', 'home', 'personal']
+          photo:
+            description: "Link to student's photo"
+            type: string
+            example: 'https://res.cloudinary.com/dha4xvgfi/image/upload/v1749060633/mef8zwaq73iedpo4owut.png'
+responses:
+  '200':
+    description: Patch a contact by id
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully patched a contact!
+            data:
+              $ref: ../../components/schemas/contact.yaml
+  '404':
+    $ref: ../../components/responses/404.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

@@ -1,0 +1,29 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: <назва вашого додатку>
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: <опис вашого додатку>
+tags:
+  - name: Contacts
+    description: Operations about contact.
+  - name: Auth
+    description: Auth operations.
+servers:
+  - url: http://localhost:3000
+  - url: https://example.com/api/v1
+paths:
+  /students/{id}:
+    get:
+      $ref: ../swagger/paths/contact/{id}/get.yaml
+  /students:
+    post:
+      $ref: '../swagger/paths/contact/post.yaml'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
