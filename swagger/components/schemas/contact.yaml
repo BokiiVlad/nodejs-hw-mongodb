@@ -40,6 +40,7 @@ properties:
   photo:
     description: "Link to student's photo"
     type: string
+    format: binary
     example: 'https://res.cloudinary.com/dha4xvgfi/image/upload/v1749060633/mef8zwaq73iedpo4owut.png'
   createdAt:
     type: string

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   version: 1.0.0
-  title: <назва вашого додатку>
+  title: GoIt homework
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -18,9 +18,15 @@ paths:
   /students/{id}:
     get:
       $ref: ../swagger/paths/contact/{id}/get.yaml
+    delete:
+      $ref: '../swagger/paths/contact/{id}/delete.yaml'
+    patch:
+      $ref: '../swagger/paths/contact/{id}/patch.yaml'
   /students:
     post:
       $ref: '../swagger/paths/contact/post.yaml'
+    get:
+      $ref: '../swagger/paths/contact/get.yaml'
 
 components:
   securitySchemes:

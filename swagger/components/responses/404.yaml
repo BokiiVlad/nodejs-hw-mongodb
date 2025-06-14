@@ -1,4 +1,4 @@
-description: Student not found
+description: Contact not found
 content:
   application/json:
     schema:
