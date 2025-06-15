@@ -10,23 +10,23 @@ required:
   - photo
 properties:
   _id:
-    description: "Student's id"
+    description: "Contact's id"
     type: string
     example: 6845bee10a5c6bd05d8c44df
   name:
-    description: "Student's name"
+    description: "Contact's name"
     type: string
     example: 'John Doe'
   phoneNumber:
-    description: "Student's phone number"
+    description: "Contact's phone number"
     type: string
     example: '+380999228945'
   email:
-    description: "Student's email"
+    description: "Contact's email"
     type: string
     example: bokiyvladik@gmail.com
   isFavourite:
-    description: 'Indicates whether the student is a favorite'
+    description: 'Indicates whether the contact is a favorite'
     type: boolean
     example: false
   contactType:

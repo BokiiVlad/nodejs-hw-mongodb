@@ -13,16 +13,16 @@ tags:
     description: Auth operations.
 servers:
   - url: http://localhost:3000
-  - url: https://example.com/api/v1
+  - url: https://nodejs-hw-mongodb-4-yj3p.onrender.com
 paths:
-  /students/{id}:
+  /contacts/{id}:
     get:
       $ref: ../swagger/paths/contact/{id}/get.yaml
     delete:
       $ref: '../swagger/paths/contact/{id}/delete.yaml'
     patch:
       $ref: '../swagger/paths/contact/{id}/patch.yaml'
-  /students:
+  /contacts:
     post:
       $ref: '../swagger/paths/contact/post.yaml'
     get:
