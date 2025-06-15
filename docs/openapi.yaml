@@ -5,7 +5,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: <опис вашого додатку>
+  description: Server for the "contact book" application
 tags:
   - name: Contacts
     description: Operations about contact.

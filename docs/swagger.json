@@ -7,14 +7,14 @@
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "description": "<опис вашого додатку>"
+    "description": "Server for the \"contact book\" application"
   },
   "servers": [
     {
       "url": "http://localhost:3000"
     },
     {
-      "url": "https://example.com/api/v1"
+      "url": "https://nodejs-hw-mongodb-4-yj3p.onrender.com"
     }
   ],
   "tags": [
@@ -28,7 +28,7 @@
     }
   ],
   "paths": {
-    "/students/{id}": {
+    "/contacts/{id}": {
       "get": {
         "tags": [
           "Contacts"
@@ -81,6 +81,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "404": {
             "$ref": "#/components/responses/404"
           },
@@ -115,6 +118,9 @@
         "responses": {
           "204": {
             "description": "Contact successfully deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -219,6 +225,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "404": {
             "$ref": "#/components/responses/404"
           },
@@ -228,7 +237,7 @@
         }
       }
     },
-    "/students": {
+    "/contacts": {
       "post": {
         "tags": [
           "Contacts"
@@ -246,6 +255,11 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "name",
+                  "phoneNumber",
+                  "email"
+                ],
                 "properties": {
                   "name": {
                     "description": "Contact's name",
@@ -278,7 +292,8 @@
                   },
                   "photo": {
                     "description": "Link to contact's photo",
-                    "type": "string"
+                    "type": "string",
+                    "format": "binary"
                   }
                 }
               }
@@ -464,6 +479,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "404": {
             "$ref": "#/components/responses/404"
           },
@@ -496,27 +514,27 @@
         ],
         "properties": {
           "_id": {
-            "description": "Student's id",
+            "description": "Contact's id",
             "type": "string",
             "example": "6845bee10a5c6bd05d8c44df"
           },
           "name": {
-            "description": "Student's name",
+            "description": "Contact's name",
             "type": "string",
             "example": "John Doe"
           },
           "phoneNumber": {
-            "description": "Student's phone number",
+            "description": "Contact's phone number",
             "type": "string",
             "example": "+380999228945"
           },
           "email": {
-            "description": "Student's email",
+            "description": "Contact's email",
             "type": "string",
             "example": "bokiyvladik@gmail.com"
           },
           "isFavourite": {
-            "description": "Indicates whether the student is a favorite",
+            "description": "Indicates whether the contact is a favorite",
             "type": "boolean",
             "example": false
           },
@@ -537,6 +555,7 @@
           "photo": {
             "description": "Link to student's photo",
             "type": "string",
+            "format": "binary",
             "example": "https://res.cloudinary.com/dha4xvgfi/image/upload/v1749060633/mef8zwaq73iedpo4owut.png"
           },
           "createdAt": {
